@@ -32,7 +32,7 @@
         android:layout_marginTop="32dp"
         android:layout_gravity="center"
         android:textSize="48sp"
-        android:fontFamily="@font/comicbd"
+        android:fontFamily="@font/oswald_medium"
         android:textColor="@color/textViewColor"
         android:text="Result" />
 
@@ -45,6 +45,7 @@
         android:background="@drawable/button_design"
         android:textSize="24sp"
         android:textColor="@color/btnTextColor"
+        android:fontFamily="@font/oswald_medium"
         android:text="Scan" />
 
 
