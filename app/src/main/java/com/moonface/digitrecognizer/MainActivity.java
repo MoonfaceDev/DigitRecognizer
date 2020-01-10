@@ -11,27 +11,25 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import java.io.ByteArrayOutputStream;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_CAMERA = 0;
     private static final int REQUEST_PERMISSION = 1;
     private ImageView imageView;
+    private Bitmap imageBitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //TODO: remove
-        launchCamera();
+        FAB cameraButton = findViewById(R.id.imgBtnCamera);
     }
 
     private void launchCamera() {
@@ -78,26 +76,19 @@ public class MainActivity extends AppCompatActivity {
         imageView.setImageBitmap(bitmap);
     }
 
+    private void scanImage(){
+        int[] matrix = toMatrix(toGrayscale(getResizedBitmap(imageBitmap, 28, 28)));
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CAMERA && resultCode == Activity.RESULT_OK) {
             //load bitmap from data intent
             Bundle extras = data.getExtras();
             assert extras != null;
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            //convert the bitmap into byte array
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            imageBitmap = (Bitmap) extras.get("data");
             assert imageBitmap != null;
-            Log.d("DIMENTIONS","w: "+imageBitmap.getWidth()+" h: "+imageBitmap.getHeight());
-            imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            byte[] byteArray = stream.toByteArray();
-            imageBitmap.recycle();
-            int[] pixels = new int[byteArray.length];
-            for (int i=0; i<byteArray.length; i++) {
-                pixels[i] = byteArray[i] & 0xFF;
-                Log.d("PIXEL", i+":   "+pixels[i]);
-            }
-            //loadImage(imageBitmap)
+            loadImage(imageBitmap);
         } else {
             //TODO: handle error
         }
