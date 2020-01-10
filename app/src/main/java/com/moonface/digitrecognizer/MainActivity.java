@@ -117,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
         if(imageBitmap != null) {
             int[] matrix = toMatrix(toGrayscale(getResizedBitmap(imageBitmap)));
             double[][][] weights = importWeights();
+            double[] biases = importBiases();
             importWeights();
         }
     }
@@ -163,7 +164,24 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    private double[] importBiases()
+    private double[] importBiases(){
+        try {
+            InputStream inputStream = getAssets().open("biases.csv");
+
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(inputStream, Charset.forName("UTF-8")));
+
+            double[] biases = new double[2];
+            biases[0] = Double.parseDouble(reader.readLine());
+            biases[1] = Double.parseDouble(reader.readLine());
+
+            return biases;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     //handle camera intent result
     @Override
