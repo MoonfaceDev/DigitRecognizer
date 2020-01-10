@@ -198,7 +198,6 @@ public class MainActivity extends AppCompatActivity {
             String line0;
             while((line0 = reader0.readLine()) != null){
                 lines0.add(line0.split(","));
-                Log.d("WEIGHTS", line0);
             }
             List<String[]> lines1 = new ArrayList<>();
             String line1;
@@ -235,8 +234,10 @@ public class MainActivity extends AppCompatActivity {
                     new InputStreamReader(inputStream, Charset.forName("UTF-8")));
 
             double[] biases = new double[2];
-            biases[0] = Double.parseDouble(reader.readLine().split(",")[0]);
-            biases[1] = Double.parseDouble(reader.readLine().split(",")[0]);
+            reader.readLine();
+            for(int i=0; i<biases.length; i++) {
+                biases[i] = Double.parseDouble(reader.readLine().split(",")[0]);
+            }
 
             return biases;
 
