@@ -11,6 +11,7 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -21,6 +22,15 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -86,8 +96,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //resize bitmap to specified dimensions
-    private Bitmap getResizedBitmap(@NonNull Bitmap bitmap, int bitmapWidth, int bitmapHeight) {
-        return Bitmap.createScaledBitmap(bitmap, bitmapWidth, bitmapHeight, true);
+    private Bitmap getResizedBitmap(@NonNull Bitmap bitmap) {
+        return Bitmap.createScaledBitmap(bitmap, 28, 28, true);
     }
 
     //converts bitmap to array of ints
@@ -105,10 +115,55 @@ public class MainActivity extends AppCompatActivity {
     //scans the digit image and displays the result
     private void scanImage(){
         if(imageBitmap != null) {
-            int[] matrix = toMatrix(toGrayscale(getResizedBitmap(imageBitmap, 28, 28)));
-
+            int[] matrix = toMatrix(toGrayscale(getResizedBitmap(imageBitmap)));
+            double[][][] weights = importWeights();
+            importWeights();
         }
     }
+
+    private double[][][] importWeights(){
+        try {
+            InputStream inputStream0 = getAssets().open("weights0.csv");
+            InputStream inputStream1 = getAssets().open("weights1.csv");
+
+            BufferedReader reader0 = new BufferedReader(
+                    new InputStreamReader(inputStream0, Charset.forName("UTF-8")));
+            BufferedReader reader1 = new BufferedReader(
+                    new InputStreamReader(inputStream1, Charset.forName("UTF-8")));
+
+            List<String[]> lines0 = new ArrayList<>();
+            String line0;
+            while((line0 = reader0.readLine()) != null){
+                lines0.add(line0.split(","));
+            }
+            List<String[]> lines1 = new ArrayList<>();
+            String line1;
+            while((line1 = reader1.readLine()) != null){
+                lines1.add(line1.split(","));
+            }
+
+            double[][] weights0 = new double[784][30];
+            for(int i=0; i<lines0.size(); i++){
+                for(int j=0; j<lines0.get(i).length; j++){
+                    weights0[i][j] = Double.parseDouble(lines0.get(i)[j]);
+                }
+            }
+            double[][] weights1 = new double[30][10];
+            for(int i=0; i<lines1.size(); i++){
+                for(int j=0; j<lines1.get(i).length; j++){
+                    weights1[i][j] = Double.parseDouble(lines1.get(i)[j]);
+                }
+            }
+
+            return new double[][][]{weights0,weights1};
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private double[] importBiases()
 
     //handle camera intent result
     @Override
