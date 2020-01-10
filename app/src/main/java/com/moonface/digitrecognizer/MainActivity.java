@@ -113,11 +113,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private @NonNull double[][] dot(double[][] a, double[][] b){
-        if(a.length != b[0].length){
+        if(a[0].length != b.length){
+            Log.d("MOONFACE", "a: "+a.length+" ?= b: "+b[0].length);
             return new double[0][0];
         }
-        int height = b.length;
-        int width = a[0].length;
+        int height = a.length;
+        int width = b[0].length;
         double[][] out = new double[height][width];
         for(int i=0; i<height; i++){
             for(int j=0; j<width; j++){
@@ -125,6 +126,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return out;
+    }
+
+    private double[][] make2D(double[] a){
+        double[][] b = new double[a.length][];
+        for(int i=0; i<a.length; i++){
+            b[i] = new double[]{a[i]};
+        }
+        return b;
     }
 
     private double dotCell(double[][] a, double[][] b, int i, int j) {
@@ -143,10 +152,10 @@ public class MainActivity extends AppCompatActivity {
         return b;
     }
 
-    private double[] add(double[] a, double[] b){
+    private double[] add(double[] a, double b){
         double[] c = a.clone();
         for(int i=0; i<a.length; i++){
-            c[i] += b[i];
+            c[i] += b;
         }
         return c;
     }
@@ -176,8 +185,8 @@ public class MainActivity extends AppCompatActivity {
             double[] biases = importBiases();
             assert weights != null;
             assert biases != null;
-            double[] hidden = sigmoid(add(dot(new double[][]{matrix}, weights[0])[0], new double[]{biases[0]}));
-            double[] output = sigmoid(add(dot(new double[][]{hidden}, weights[1])[0], new double[]{biases[1]}));
+            double[] hidden = sigmoid(add(dot(new double[][]{matrix}, weights[0])[0], biases[0]));
+            double[] output = sigmoid(add(dot(new double[][]{hidden}, weights[1])[0], biases[1]));
             int result = maxIndex(output);
             TextView resultView = findViewById(R.id.result_text);
             resultView.setText(String.valueOf(result));
