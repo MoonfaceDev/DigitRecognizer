@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         launchCamera();
     }
 
-    private void launchCamera(){
+    private void launchCamera() {
         int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (permission == PackageManager.PERMISSION_GRANTED) {
             Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -44,43 +44,42 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void loadImage(Bitmap bitmap){
+    private void loadImage(Bitmap bitmap) {
         imageView.setImageBitmap(bitmap);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_CAMERA:
-                if(resultCode == Activity.RESULT_OK) {
-                    //load bitmap from data intent
-                    Bundle extras = data.getExtras();
-                    assert extras != null;
-                    Bitmap imageBitmap = (Bitmap) extras.get("data");
-                    //convert the bitmap into byte array
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    assert imageBitmap != null;
-                    imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                    byte[] byteArray = stream.toByteArray();
-                    imageBitmap.recycle();
-                    //TODO: remove
-                    for (byte b : byteArray) {
-                        Log.d("BYTE ARRAY", String.valueOf(b));
-                    }
-                    //loadImage(imageBitmap)
-                } else {
-                    //TODO: implement error message
-                }
-                return;
-            case REQUEST_PERMISSION:
-                if(resultCode == Activity.RESULT_OK) {
-                    launchCamera();
-                } else {
-                    //TODO: implement error message
-                }
-                return;
-            default:
-                //TODO: implement error message
+        if (requestCode == REQUEST_CAMERA && resultCode == Activity.RESULT_OK) {
+            //load bitmap from data intent
+            Bundle extras = data.getExtras();
+            assert extras != null;
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            //convert the bitmap into byte array
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            assert imageBitmap != null;
+            imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+            imageBitmap.recycle();
+            int[] pixels = new int[byteArray.length];
+            for (int i=0; i<byteArray.length; i++) {
+                pixels[i] = byteArray[i] & 0xFF;
+                Log.d("PIXEL", i+":   "+pixels[i]);
+            }
+            //loadImage(imageBitmap)
+        } else {
+            //TODO: handle error
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == REQUEST_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                launchCamera();
+            } else {
+                //TODO: handle error
+            }
         }
     }
 }
