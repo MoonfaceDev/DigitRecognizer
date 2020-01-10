@@ -14,6 +14,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         return Bitmap.createScaledBitmap(bitmap, 28, 28, true);
     }
 
-    //converts bitmap to array of ints
+    //converts bitmap to array of doubles
     private double[] toMatrix(@NonNull Bitmap bitmap){
         int[] matrix = new int[bitmap.getHeight()*bitmap.getWidth()];
         bitmap.getPixels(matrix, 0, bitmap.getWidth(),0,0,bitmap.getWidth(),bitmap.getHeight());
@@ -109,6 +110,57 @@ public class MainActivity extends AppCompatActivity {
             d_matrix[i] = matrix[i];
         }
         return d_matrix;
+    }
+
+    private @NonNull double[][] dot(double[][] a, double[][] b){
+        if(a.length != b[0].length){
+            return new double[0][0];
+        }
+        int height = b.length;
+        int width = a[0].length;
+        double[][] out = new double[height][width];
+        for(int i=0; i<height; i++){
+            for(int j=0; j<width; j++){
+                out[i][j] = dotCell(a,b,i,j);
+            }
+        }
+        return out;
+    }
+
+    private double dotCell(double[][] a, double[][] b, int i, int j) {
+        double c = 0;
+        for (int k = 0; k < b.length; k++) {
+            c += a[i][k] * b[k][j];
+        }
+        return c;
+    }
+
+    private double[] sigmoid(double[] a){
+        double[] b = a.clone();
+        for(int i=0; i<=a.length; i++){
+            b[i] = 1/(1+Math.exp(-a[i]));
+        }
+        return b;
+    }
+
+    private double[] add(double[] a, double[] b){
+        double[] c = a.clone();
+        for(int i=0; i<a.length; i++){
+            c[i] += b[i];
+        }
+        return c;
+    }
+
+    private int maxIndex(double[] a){
+        double max = 0;
+        int maxIndex = 0;
+        for(int i=0; i<a.length; i++){
+            if(a[i] > max){
+                max = a[i];
+                maxIndex = i;
+            }
+        }
+        return maxIndex;
     }
 
     //loads bitmap into the image view
@@ -122,7 +174,13 @@ public class MainActivity extends AppCompatActivity {
             double[] matrix = toMatrix(toGrayscale(getResizedBitmap(imageBitmap)));
             double[][][] weights = importWeights();
             double[] biases = importBiases();
-
+            assert weights != null;
+            assert biases != null;
+            double[] hidden = sigmoid(add(dot(new double[][]{matrix}, weights[0])[0], new double[]{biases[0]}));
+            double[] output = sigmoid(add(dot(new double[][]{hidden}, weights[1])[0], new double[]{biases[1]}));
+            int result = maxIndex(output);
+            TextView resultView = findViewById(R.id.result_text);
+            resultView.setText(String.valueOf(result));
         }
     }
 
@@ -140,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
             String line0;
             while((line0 = reader0.readLine()) != null){
                 lines0.add(line0.split(","));
+                Log.d("WEIGHTS", line0);
             }
             List<String[]> lines1 = new ArrayList<>();
             String line1;
@@ -148,15 +207,15 @@ public class MainActivity extends AppCompatActivity {
             }
 
             double[][] weights0 = new double[784][30];
-            for(int i=0; i<lines0.size(); i++){
-                for(int j=0; j<lines0.get(i).length; j++){
-                    weights0[i][j] = Double.parseDouble(lines0.get(i)[j]);
+            for(int i=0; i<lines0.size()-1; i++){
+                for(int j=0; j<lines0.get(i).length-1; j++){
+                    weights0[i][j] = Double.parseDouble(lines0.get(i+1)[j+1]);
                 }
             }
             double[][] weights1 = new double[30][10];
-            for(int i=0; i<lines1.size(); i++){
-                for(int j=0; j<lines1.get(i).length; j++){
-                    weights1[i][j] = Double.parseDouble(lines1.get(i)[j]);
+            for(int i=0; i<lines1.size()-1; i++){
+                for(int j=0; j<lines1.get(i).length-1; j++){
+                    weights1[i][j] = Double.parseDouble(lines1.get(i+1)[j+1]);
                 }
             }
 
@@ -176,8 +235,8 @@ public class MainActivity extends AppCompatActivity {
                     new InputStreamReader(inputStream, Charset.forName("UTF-8")));
 
             double[] biases = new double[2];
-            biases[0] = Double.parseDouble(reader.readLine());
-            biases[1] = Double.parseDouble(reader.readLine());
+            biases[0] = Double.parseDouble(reader.readLine().split(",")[0]);
+            biases[1] = Double.parseDouble(reader.readLine().split(",")[0]);
 
             return biases;
 
