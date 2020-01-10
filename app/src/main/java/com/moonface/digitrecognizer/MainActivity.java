@@ -101,10 +101,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //converts bitmap to array of ints
-    private int[] toMatrix(@NonNull Bitmap bitmap){
+    private double[] toMatrix(@NonNull Bitmap bitmap){
         int[] matrix = new int[bitmap.getHeight()*bitmap.getWidth()];
         bitmap.getPixels(matrix, 0, bitmap.getWidth(),0,0,bitmap.getWidth(),bitmap.getHeight());
-        return matrix;
+        double[] d_matrix = new double[matrix.length];
+        for(int i=0; i<matrix.length; i++){
+            d_matrix[i] = matrix[i];
+        }
+        return d_matrix;
     }
 
     //loads bitmap into the image view
@@ -115,10 +119,10 @@ public class MainActivity extends AppCompatActivity {
     //scans the digit image and displays the result
     private void scanImage(){
         if(imageBitmap != null) {
-            int[] matrix = toMatrix(toGrayscale(getResizedBitmap(imageBitmap)));
+            double[] matrix = toMatrix(toGrayscale(getResizedBitmap(imageBitmap)));
             double[][][] weights = importWeights();
             double[] biases = importBiases();
-            importWeights();
+
         }
     }
 
