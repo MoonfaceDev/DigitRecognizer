@@ -11,12 +11,15 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.View;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 
@@ -32,6 +35,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         FloatingActionButton cameraButton = findViewById(R.id.camera_button);
+        MaterialButton scanButton = findViewById(R.id.scan_button);
+        imageView = findViewById(R.id.digit_image);
+
+        cameraButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchCamera();
+            }
+        });
+        scanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                scanImage();
+            }
+        });
     }
 
     //launches the camera intent
@@ -67,13 +85,13 @@ public class MainActivity extends AppCompatActivity {
         return grayscale;
     }
 
-    //resizes bitmap to specified dimensions
-    private Bitmap getResizedBitmap(Bitmap bitmap, int bitmapWidth, int bitmapHeight) {
+    //resize bitmap to specified dimensions
+    private Bitmap getResizedBitmap(@NonNull Bitmap bitmap, int bitmapWidth, int bitmapHeight) {
         return Bitmap.createScaledBitmap(bitmap, bitmapWidth, bitmapHeight, true);
     }
 
     //converts bitmap to array of ints
-    private int[] toMatrix(Bitmap bitmap){
+    private int[] toMatrix(@NonNull Bitmap bitmap){
         int[] matrix = new int[bitmap.getHeight()*bitmap.getWidth()];
         bitmap.getPixels(matrix, 0, bitmap.getWidth(),0,0,bitmap.getWidth(),bitmap.getHeight());
         return matrix;
@@ -84,10 +102,15 @@ public class MainActivity extends AppCompatActivity {
         imageView.setImageBitmap(bitmap);
     }
 
+    //scans the digit image and displays the result
     private void scanImage(){
-        int[] matrix = toMatrix(toGrayscale(getResizedBitmap(imageBitmap, 28, 28)));
+        if(imageBitmap != null) {
+            int[] matrix = toMatrix(toGrayscale(getResizedBitmap(imageBitmap, 28, 28)));
+
+        }
     }
 
+    //handle camera intent result
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -97,12 +120,14 @@ public class MainActivity extends AppCompatActivity {
             assert extras != null;
             imageBitmap = (Bitmap) extras.get("data");
             assert imageBitmap != null;
+            //load image into imageView
             loadImage(imageBitmap);
         } else {
             //TODO: handle error
         }
     }
 
+    //launch camera after got permission
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == REQUEST_PERMISSION) {

@@ -8,7 +8,7 @@
     tools:context=".MainActivity">
 
     <ImageView
-        android:id="@+id/img_view"
+        android:id="@+id/digit_image"
         android:layout_width="256dp"
         android:layout_height="256dp"
         android:layout_centerHorizontal="true"
@@ -16,10 +16,10 @@
         android:background="#EEEEEE" />
 
     <TextView
-        android:id="@+id/text_view_result"
+        android:id="@+id/result_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/img_view"
+        android:layout_below="@id/digit_image"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="32dp"
         android:fontFamily="@font/oswald_medium"
@@ -28,10 +28,10 @@
         tools:text="Result" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_scanner"
+        android:id="@+id/scan_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/text_view_result"
+        android:layout_below="@id/result_text"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="44dp"
         android:fontFamily="@font/oswald_medium"
