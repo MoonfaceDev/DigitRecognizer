@@ -35,8 +35,11 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="44dp"
         android:fontFamily="@font/oswald_medium"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp"
         android:text="@string/scan"
-        android:textSize="24sp" />
+        android:textSize="24sp"
+        app:cornerRadius="90dp" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/camera_button"
