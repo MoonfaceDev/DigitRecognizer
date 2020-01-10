@@ -7,26 +7,25 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <ImageButton
-        android:id="@+id/imgBtnCamera"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="@drawable/button_design"
-        android:layout_gravity="end"
-        android:layout_marginRight="8dp"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_camera"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:layout_marginTop="12dp"
+        android:clickable="true"
         app:srcCompat="@android:drawable/ic_menu_camera" />
 
     <ImageView
-        android:id="@+id/imgView"
+        android:id="@+id/img_view"
         android:layout_width="256dp"
         android:layout_height="256dp"
         android:layout_gravity="center"
         android:layout_marginTop="96dp"
-        app:srcCompat="@drawable/painting_frame_icon" />
+        app:srcCompat="@drawable/background_img" />
 
     <TextView
-        android:id="@+id/textViewResult"
+        android:id="@+id/text_view_result"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
@@ -37,7 +36,7 @@
         android:text="Result" />
 
     <Button
-        android:id="@+id/btnScanner"
+        android:id="@+id/btn_scanner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
