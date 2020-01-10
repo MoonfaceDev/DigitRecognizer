@@ -34,20 +34,23 @@ public class MainActivity extends AppCompatActivity {
         FloatingActionButton cameraButton = findViewById(R.id.camera_button);
     }
 
+    //launches the camera intent
     private void launchCamera() {
+        //checks if app has camera permission
         int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (permission == PackageManager.PERMISSION_GRANTED) {
+            //launches camera intent
             Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             if (cameraIntent.resolveActivity(getPackageManager()) != null) {
                 startActivityForResult(cameraIntent, REQUEST_CAMERA);
             }
         } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA},
-                    REQUEST_PERMISSION);
+            //requests permission
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_PERMISSION);
         }
     }
 
+    //converts bitmap to grayscale (0-255)
     Bitmap toGrayscale(Bitmap bmpOriginal)
     {
         int height = bmpOriginal.getHeight();
@@ -64,16 +67,19 @@ public class MainActivity extends AppCompatActivity {
         return grayscale;
     }
 
+    //resizes bitmap to specified dimensions
     private Bitmap getResizedBitmap(Bitmap bitmap, int bitmapWidth, int bitmapHeight) {
         return Bitmap.createScaledBitmap(bitmap, bitmapWidth, bitmapHeight, true);
     }
 
+    //converts bitmap to array of ints
     private int[] toMatrix(Bitmap bitmap){
         int[] matrix = new int[bitmap.getHeight()*bitmap.getWidth()];
         bitmap.getPixels(matrix, 0, bitmap.getWidth(),0,0,bitmap.getWidth(),bitmap.getHeight());
         return matrix;
     }
 
+    //loads bitmap into the image view
     private void loadImage(Bitmap bitmap) {
         imageView.setImageBitmap(bitmap);
     }
