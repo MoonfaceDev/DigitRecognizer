@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         FloatingActionButton cameraButton = findViewById(R.id.camera_button);
         MaterialButton scanButton = findViewById(R.id.scan_button);
-        MaterialButton dataButton = findViewById(R.id.data_button);
+        MaterialButton statsButton = findViewById(R.id.stats_button);
         imageView = findViewById(R.id.digit_image);
         parent = findViewById(R.id.parent);
 
@@ -68,10 +68,10 @@ public class MainActivity extends AppCompatActivity {
                 scanImage();
             }
         });
-        dataButton.setOnClickListener(new View.OnClickListener() {
+        statsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                launchDataDialog();
+                launchStatsDialog();
             }
         });
 
@@ -79,14 +79,15 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(myToolbar);
     }
 
-    private void launchDataDialog(){
+    private void launchStatsDialog(){
         if(stats != null) {
             AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-            StringBuilder dataString = new StringBuilder();
+            StringBuilder statsString = new StringBuilder();
             for (int i = 0; i < stats.length; i++) {
-                dataString.append(i).append(":  ").append(decimal.format(stats[i]/sum(stats) * 100)).append("%\n");
+                statsString.append(i).append(":  ").append(decimal.format(stats[i]/sum(stats) * 100)).append("%\n");
             }
-            dialogBuilder.setMessage(dataString.toString());
+            dialogBuilder.setTitle(R.string.stats);
+            dialogBuilder.setMessage(statsString.toString());
             dialogBuilder.create().show();
         }
     }
