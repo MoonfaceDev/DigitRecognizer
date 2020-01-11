@@ -15,7 +15,6 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_CAMERA = 0;
     private static final int REQUEST_PERMISSION = 1;
-    private static final DecimalFormat decimal = new DecimalFormat("0.00");
+    private static final DecimalFormat decimal = new DecimalFormat("0.0");
     private ImageView imageView;
     private Bitmap imageBitmap;
     private double[] stats;
@@ -81,11 +80,19 @@ public class MainActivity extends AppCompatActivity {
             AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
             StringBuilder dataString = new StringBuilder();
             for (int i = 0; i < stats.length; i++) {
-                dataString.append(i).append(":  ").append(decimal.format(stats[i] * 100)).append("%\n");
+                dataString.append(i).append(":  ").append(decimal.format(stats[i]/sum(stats) * 100)).append("%\n");
             }
             dialogBuilder.setMessage(dataString.toString());
             dialogBuilder.create().show();
         }
+    }
+
+    private double sum(double[] a){
+        double sum = 0;
+        for (double d : a){
+            sum += d;
+        }
+        return sum;
     }
 
     //launches the camera intent
