@@ -38,9 +38,11 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    //Constants
     private static final int REQUEST_CAMERA = 0;
     private static final int REQUEST_PERMISSION = 1;
     private static final DecimalFormat decimal = new DecimalFormat("0.0");
+    //Fields
     private ImageView imageView;
     private Bitmap imageBitmap;
     private double[] stats;
@@ -50,12 +52,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //Initialize UI components
         FloatingActionButton cameraButton = findViewById(R.id.camera_button);
         MaterialButton scanButton = findViewById(R.id.scan_button);
         MaterialButton statsButton = findViewById(R.id.stats_button);
         imageView = findViewById(R.id.digit_image);
         parent = findViewById(R.id.parent);
 
+        //Set on click listeners
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -75,23 +79,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //initialize toolbar
         Toolbar myToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
     }
 
+    //Opens scanning stats dialog
     private void launchStatsDialog(){
         if(stats != null) {
             AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+            //Build stats string
             StringBuilder statsString = new StringBuilder();
             for (int i = 0; i < stats.length; i++) {
                 statsString.append(i).append(":  ").append(decimal.format(stats[i]/sum(stats) * 100)).append("%\n");
             }
+
             dialogBuilder.setTitle(R.string.stats);
             dialogBuilder.setMessage(statsString.toString());
             dialogBuilder.create().show();
         }
     }
 
+    //Returns a double array sum
     private double sum(double[] a){
         double sum = 0;
         for (double d : a){
@@ -116,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //converts bitmap to grayscale (0-255)
+    //Converts bitmap to grayscale (0-255)
     Bitmap toGrayscale(Bitmap bmpOriginal)
     {
         int height = bmpOriginal.getHeight();
@@ -133,12 +142,12 @@ public class MainActivity extends AppCompatActivity {
         return grayscale;
     }
 
-    //resize bitmap to specified dimensions
+    //Resize bitmap to specified dimensions
     private Bitmap getResizedBitmap(@NonNull Bitmap bitmap) {
         return Bitmap.createScaledBitmap(bitmap, 28, 28, true);
     }
 
-    //converts bitmap to array of doubles
+    //Converts bitmap to array of doubles (0-1)
     private double[] toMatrix(@NonNull Bitmap bitmap){
         int[] matrix = new int[bitmap.getHeight()*bitmap.getWidth()];
         bitmap.getPixels(matrix, 0, bitmap.getWidth(),0,0,bitmap.getWidth(),bitmap.getHeight());
@@ -152,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
         return d_matrix;
     }
 
+    //Dot product of two matrices
     private @NonNull double[][] dot(double[][] a, double[][] b){
         if(a[0].length != b.length){
             return new double[0][0];
@@ -167,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
         return out;
     }
 
+    //Handles dot product for each cell
     private double dotCell(double[][] a, double[][] b, int i, int j) {
         double c = 0;
         for (int k = 0; k < b.length; k++) {
@@ -175,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
         return c;
     }
 
+    //Sigmoid function for array
     private double[] sigmoid(double[] a){
         double[] b = new double[a.length];
         for(int i=0; i<a.length; i++){
@@ -183,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
         return b;
     }
 
+    //Adds a scalar to the given vector
     private double[] add(double[] a, double b){
         double[] c = a.clone();
         for(int i=0; i<a.length; i++){
@@ -191,6 +204,7 @@ public class MainActivity extends AppCompatActivity {
         return c;
     }
 
+    //Returns the index of the greatest element
     private int maxIndex(double[] a){
         double max = 0;
         int maxIndex = 0;
@@ -208,30 +222,31 @@ public class MainActivity extends AppCompatActivity {
         imageView.setImageBitmap(bitmap);
     }
 
-    //scans the digit image and displays the result
+    //Scans the digit image and displays the result
     private void scanImage(){
         if(imageBitmap != null) {
             double[] matrix = toMatrix(imageBitmap);
+            //Import weights and biases from database
             double[][][] weights = importWeights();
             double[] biases = importBiases();
             assert weights != null;
             assert biases != null;
+            //Feed forward
             double[] hidden = sigmoid(add(dot(new double[][]{matrix}, weights[0])[0], biases[0]));
             double[] output = sigmoid(add(dot(new double[][]{hidden}, weights[1])[0], biases[1]));
+            //Update stats array
             stats = output.clone();
             int result = maxIndex(output);
-            StringBuilder matrixBuilder = new StringBuilder();
-            for(double i : matrix){
-                matrixBuilder.append(i);
-                matrixBuilder.append(",");
-            }
+            //Displays the result
             TextView resultView = findViewById(R.id.result_text);
             resultView.setText(String.valueOf(result));
         }
     }
 
+    //Imports weights from database
     private double[][][] importWeights(){
         try {
+            //Read the csv files
             InputStream inputStream0 = getAssets().open("weights0.csv");
             InputStream inputStream1 = getAssets().open("weights1.csv");
 
@@ -240,6 +255,7 @@ public class MainActivity extends AppCompatActivity {
             BufferedReader reader1 = new BufferedReader(
                     new InputStreamReader(inputStream1, Charset.forName("UTF-8")));
 
+            //Read the files line by line to a list
             List<String[]> lines0 = new ArrayList<>();
             String line0;
             while((line0 = reader0.readLine()) != null){
@@ -251,6 +267,7 @@ public class MainActivity extends AppCompatActivity {
                 lines1.add(line1.split(","));
             }
 
+            //Convert the list to double matrices
             double[][] weights0 = new double[784][30];
             for(int i=0; i<lines0.size()-1; i++){
                 for(int j=0; j<lines0.get(i).length-1; j++){
@@ -272,13 +289,16 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
+    //Imports biases from database
     private double[] importBiases(){
         try {
+            //Read the csv file
             InputStream inputStream = getAssets().open("biases.csv");
 
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(inputStream, Charset.forName("UTF-8")));
 
+            //Build biases array
             double[] biases = new double[2];
             reader.readLine();
             for(int i=0; i<biases.length; i++) {
@@ -293,31 +313,34 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    //handle camera intent result
+    //Handle camera intent result
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CAMERA && resultCode == Activity.RESULT_OK) {
-            //load bitmap from data intent
+            //Load bitmap from data intent
             Bundle extras = data.getExtras();
             assert extras != null;
             Bitmap temp = (Bitmap) extras.get("data");
             assert temp != null;
             imageBitmap = toGrayscale(getResizedBitmap(temp));
-            //load image into imageView
+            //Load image into imageView
             loadImage(imageBitmap);
         } else {
+            //Handle errors
             Snackbar.make(parent, "Error occurred. Cannot load image", Snackbar.LENGTH_SHORT).show();
         }
     }
 
-    //launch camera after got permission
+    //Launch camera after got permission
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //Got permission
                 launchCamera();
             } else {
+                //Permission denied
                 Snackbar.make(parent, "Permission denied. Please try again.", Snackbar.LENGTH_SHORT).show();
             }
         }
