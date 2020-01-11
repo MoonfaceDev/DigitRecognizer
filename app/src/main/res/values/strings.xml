@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">Digit Recognizer</string>
     <string name="scan">Scan</string>
+    <string name="cd_digit_image">Digit image</string>
+    <string name="data">Data</string>
 </resources>

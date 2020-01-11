@@ -24,7 +24,8 @@
         android:layout_below="@id/toolbar"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="32dp"
-        android:background="#EEEEEE" />
+        android:background="#EEEEEE"
+        android:contentDescription="@string/cd_digit_image" />
 
     <TextView
         android:id="@+id/result_text"
@@ -62,7 +63,7 @@
         android:fontFamily="@font/oswald_medium"
         android:paddingStart="32dp"
         android:paddingEnd="32dp"
-        android:text="Data"
+        android:text="@string/data"
         android:textSize="24sp"
         app:cornerRadius="90dp" />
 
